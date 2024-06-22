@@ -2,6 +2,7 @@
 
 ## Learning Resources
 [techTFQ SQL For Beginners](https://www.youtube.com/watch?v=a-hFbr-4VQQ&list=PLavw5C92dz9Ef4E-1Zi9KfCTXS_IN8gXZ)
+[Secret To Optimizing SQL Queries - Understand The SQL Execution Order](https://www.youtube.com/watch?v=BHwzDmr6d7s)
 
 ## CRM System - Update Customer Information Based on Recent Orders
 
