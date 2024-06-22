@@ -5,6 +5,49 @@
 
 [Secret To Optimizing SQL Queries - Understand The SQL Execution Order](https://www.youtube.com/watch?v=BHwzDmr6d7s)
 
+## Mastering SQL Joins: Avoiding Common Pitfalls
+
+In SQL, understanding the nuances between different types of joins can significantly impact the results of your queries. One common misconception revolves around the distinction between LEFT JOIN and INNER JOIN, particularly when adding conditions that involve the right table. Let's delve into this issue with a practical example.
+
+Consider two tables in a database: `orders` and `customers`. You want to retrieve all orders, even those without a matching customer, but you're only interested in `active` customers.
+
+### The LEFT JOIN Misstep
+
+A LEFT JOIN ensures all records from the left table (orders) are included, along with matching records from the right table (customers). However, problems arise when filtering the right table in the WHERE clause:
+
+```sql
+SELECT *
+FROM orders o
+LEFT JOIN customers c ON o.customer_id = c.customer_id
+WHERE c.status = 'active'; -- Issue: This turns the LEFT JOIN into an INNER JOIN
+```
+
+Adding c.status = 'active' in the WHERE clause filters out NULL values from customers, effectively excluding orders with no matching 'active' customer. This unintended consequence alters the join's behavior from a LEFT JOIN to an INNER JOIN.
+
+### The Solution: Proper Usage of ON Clause
+
+To maintain the integrity of a LEFT JOIN while filtering conditions from the right table, use the ON clause instead of WHERE:
+
+```sql
+SELECT *
+FROM orders o
+LEFT JOIN customers c ON o.customer_id = c.customer_id AND c.status = 'active';
+```
+
+### Conclusion
+
+By applying conditions directly within the ON clause of a LEFT JOIN, you preserve the intended left-to-right table inclusion, ensuring all orders are retrieved while adhering to specific customer status criteria.
+
+#### Solution 2
+Use WHERE clause with the right table in the subquery
+
+```sql
+SELECT o.*
+FROM orders o
+LEFT JOIN (SELECT c.* FROM customers c WHERE c.status = 'active') AS active_customers ON o.customer_id = active_customers.customer_id;
+```
+
+
 ## CRM System - Update Customer Information Based on Recent Orders
 
 ### Overview
