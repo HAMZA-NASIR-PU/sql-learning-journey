@@ -89,6 +89,8 @@ The CRM system consists of two tables:
 
 To update the status of customers to "VIP" if their total spending exceeds $10,000, you can use the following SQL query:
 
+#### Solution 1
+
 ```sql
 UPDATE customers
 JOIN (
@@ -99,7 +101,16 @@ JOIN (
 SET customers.status = 'VIP'
 WHERE customer_orders.total_spent > 10000;
 ```
+#### Solution 2
 
+```sql
+SET SQL_SAFE_UPDATES = 0;  --Disable safe mode in mysql;
+UPDATE customers
+JOIN (SELECT customer_id, SUM(total_amount) AS total_spending 
+     FROM orders GROUP BY customer_id HAVING SUM(total_amount) > 10000) AS spending
+ON customers.customer_id = spending.customer_id
+SET customers.status = 'VIP';
+```
 ### Example
 
 Before running the update, the `customers` table looks like this:
