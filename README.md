@@ -1,5 +1,8 @@
 # sql-learning-journey
 
+## Learning Resources
+[https://www.youtube.com/watch?v=a-hFbr-4VQQ&list=PLavw5C92dz9Ef4E-1Zi9KfCTXS_IN8gXZ][techTFQ]
+
 ## CRM System - Update Customer Information Based on Recent Orders
 
 ### Overview
