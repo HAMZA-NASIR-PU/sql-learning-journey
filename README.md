@@ -36,7 +36,7 @@ LEFT JOIN customers c ON o.customer_id = c.customer_id AND c.status = 'active';
 
 ### Conclusion
 
-By applying conditions directly within the ON clause of a LEFT JOIN, you preserve the intended left-to-right table inclusion, ensuring all orders are retrieved while adhering to specific customer status criteria.
+The `WHERE` takes place after the `JOIN` is performed and it filters on the data from both tables. Whereas with `ON` conditions on the left join, the filtering only takes place on the right table.
 
 #### Solution 2
 Use WHERE clause with the right table in the subquery
