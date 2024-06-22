@@ -47,6 +47,79 @@ FROM orders o
 LEFT JOIN (SELECT c.* FROM customers c WHERE c.status = 'active') AS active_customers ON o.customer_id = active_customers.customer_id;
 ```
 
+## Order of execution of a SQL Query
+
+Consider the following sql query:
+
+```sql
+SELECT
+    departments.department_name,
+    COUNT(employees.employee_id) AS employee_count,
+    AVG(employees.salary) AS average_salary
+FROM
+    employees
+JOIN
+    departments ON employees.department_id = departments.department_id
+GROUP BY
+    departments.department_name
+HAVING
+    COUNT(employees.employee_id) > 5
+ORDER BY
+    average_salary DESC;
+```
+
+1. **FROM Clause**:
+   - The `FROM` clause is processed first. It determines the tables to be queried.
+   - The `employees` table is identified as the primary table.
+
+2. **JOIN Clause**:
+   - Next, the `JOIN` clause is executed. 
+   - The `employees` table is joined with the `departments` table on the `department_id` column.
+   - This creates a combined result set that includes columns from both tables.
+
+3. **WHERE Clause**:
+   - If there were a `WHERE` clause, it would be executed next to filter rows based on specified conditions.
+   - In this query, there is no `WHERE` clause.
+
+4. **GROUP BY Clause**:
+   - The `GROUP BY` clause is then executed to group rows that have the same values in specified columns.
+   - Rows are grouped by `departments.department_name`.
+
+5. **HAVING Clause**:
+   - The `HAVING` clause is processed next. It filters groups created by the `GROUP BY` clause based on aggregate conditions.
+   - Only groups with a count of employees greater than 5 are included in the final result.
+
+6. **SELECT Clause**:
+   - The `SELECT` clause is executed to determine which columns will appear in the result.
+   - It calculates the `department_name`, `COUNT(employees.employee_id) AS employee_count`, and `AVG(employees.salary) AS average_salary`.
+
+7. **ORDER BY Clause**:
+   - The `ORDER BY` clause is executed last to sort the final result set.
+   - The results are ordered by `average_salary` in descending order.
+  
+
+### Execution Steps Explained
+
+1. **FROM**:
+   - Identify `employees` table.
+
+2. **JOIN**:
+   - Combine `employees` with `departments` based on matching `department_id`.
+
+3. **GROUP BY**:
+   - Group the combined rows by `department_name`.
+
+4. **HAVING**:
+   - Filter groups to only those with more than 5 employees.
+
+5. **SELECT**:
+   - Calculate and select the required columns: department name, employee count, and average salary.
+
+6. **ORDER BY**:
+   - Sort the final results by average salary in descending order.
+
+
+
 
 ## CRM System - Update Customer Information Based on Recent Orders
 
