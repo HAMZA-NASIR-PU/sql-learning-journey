@@ -13,6 +13,20 @@ In this example, we demonstrate how to update the `last_order_date` in the `cust
 
 ### Tables
 
+The CRM system consists of two tables:
+
+#### `customers`
+- `customer_id`: Unique identifier for each customer
+- `name`: Name of the customer
+- `email`: Email address of the customer
+- `last_order_date`: Recent order date
+  
+### #`orders`
+- `order_id`: Unique identifier for each order
+- `customer_id`: Identifier for the customer who placed the order
+- `order_date`: Date when the order was placed
+- `total_amount`: Total amount of the order
+
 #### Customers
 
 | customer_id | name | email | last_order_date |
