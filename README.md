@@ -138,7 +138,7 @@ The CRM system consists of two tables:
 - `email`: Email address of the customer
 - `status`: Status of the customer (e.g., "VIP")
 
-### #`orders`
+#### `orders`
 - `order_id`: Unique identifier for each order
 - `customer_id`: Identifier for the customer who placed the order
 - `order_date`: Date when the order was placed
@@ -198,3 +198,37 @@ After running the update, the `customers` table will be updated to:
 ### Conclusion
 
 This SQL query helps in efficiently updating customer statuses based on their spending. Modify the threshold value as per your requirements to categorize customers as "VIP" or any other status.
+
+## CRM System - Updating Email Preferences Based on Customer Interactions
+
+### Introduction
+
+In this example, we want to update the email preferences of customers based on their recent interactions. Specifically, we'll mark a customer's email preference as 'inactive' if they haven't had an email interaction in the past year.
+
+#### `customers`
+- `customer_id`: Unique identifier for each customer
+- `name`: Name of the customer
+- `email`: Email address of the customer
+- `email_preference`: active or inactive
+
+#### `interactions`
+- `interaction_id`: Unique identifier for each interaction
+- `customer_id`: Identifier for the customer who did the interaction
+- `interaction_type`: email/phone/chat
+- `interaction_date`: Date on which a particular interaction taken place.
+
+#### Solution
+
+```sql
+UPDATE customers
+LEFT JOIN (SELECT customer_id, MAX(interaction_date) AS last_email_date FROM interactions
+		   WHERE interaction_type='email' GROUP BY customer_id) AS email_interactions
+ON customers.customer_id = email_interactions.customer_id
+SET customers.email_preference='inactive'
+WHERE email_interactions.last_email_date IS NULL
+      OR email_interactions.last_email_date < DATE_SUB(CURDATE(), INTERVAL 1 YEAR);
+```
+
+### Conclusion
+
+By using this query, we can effectively manage the email preferences of customers based on their recent interactions, ensuring that inactive customers are appropriately marked. This helps in maintaining an up-to-date and relevant email list for marketing and communication purposes.
