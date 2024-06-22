@@ -1,7 +1,7 @@
 # sql-learning-journey
 
 ## Learning Resources
-[techTFQ](https://www.youtube.com/watch?v=a-hFbr-4VQQ&list=PLavw5C92dz9Ef4E-1Zi9KfCTXS_IN8gXZ)
+[techTFQ SQL For Beginners](https://www.youtube.com/watch?v=a-hFbr-4VQQ&list=PLavw5C92dz9Ef4E-1Zi9KfCTXS_IN8gXZ)
 
 ## CRM System - Update Customer Information Based on Recent Orders
 
