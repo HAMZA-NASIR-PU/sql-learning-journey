@@ -60,3 +60,68 @@ After running the update, the `customers` table will be updated to:
 ### Conclusion
 
 This query efficiently updates the `last_order_date` for each customer to reflect their most recent order, ensuring that the `customers` table always has the latest information.
+
+
+## CRM System - Customer Status Update
+
+This explains how to update the status of customers in a Customer Relationship Management (CRM) system to "VIP" if their total spending exceeds a certain amount (e.g., $10,000). The process involves using an SQL `UPDATE` query with a `JOIN` in MySQL.
+
+### Database Structure
+
+The CRM system consists of two tables:
+
+#### `customers`
+- `customer_id`: Unique identifier for each customer
+- `name`: Name of the customer
+- `email`: Email address of the customer
+- `status`: Status of the customer (e.g., "VIP")
+
+### #`orders`
+- `order_id`: Unique identifier for each order
+- `customer_id`: Identifier for the customer who placed the order
+- `order_date`: Date when the order was placed
+- `total_amount`: Total amount of the order
+
+### Updating Customer Status
+
+To update the status of customers to "VIP" if their total spending exceeds $10,000, you can use the following SQL query:
+
+```sql
+UPDATE customers
+JOIN (
+    SELECT customer_id, SUM(total_amount) AS total_spent
+    FROM orders
+    GROUP BY customer_id
+) AS customer_orders ON customers.customer_id = customer_orders.customer_id
+SET customers.status = 'VIP'
+WHERE customer_orders.total_spent > 10000;
+```
+
+### Example
+
+Before running the update, the `customers` table looks like this:
+#### Customers
+
+| customer_id | name | email | status |
+|-------------|------|-------|-----------------|
+| 1           | John Doe | john@example.com | NULL     |
+| 2           | Jane Smith | jane@example.com | NULL     |
+
+#### Orders
+
+| order_id | customer_id | order_date | total_amount |
+|----------|-------------|------------|--------------|
+| 101      | 1           | 2023-06-15 | 6000.00       |
+| 102      | 1           | 2023-06-18 | 5000.00       |
+| 103      | 2           | 2023-06-20 | 8000.00       |
+
+After running the update, the `customers` table will be updated to:
+
+| customer_id | name | email | status |
+|-------------|------|-------|-----------------|
+| 1           | John Doe | john@example.com | VIP     |
+| 2           | Jane Smith | jane@example.com | NULL     |
+
+### Conclusion
+
+This SQL query helps in efficiently updating customer statuses based on their spending. Modify the threshold value as per your requirements to categorize customers as "VIP" or any other status.
