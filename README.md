@@ -64,7 +64,7 @@ The CRM system consists of two tables:
 - `email`: Email address of the customer
 - `last_order_date`: Recent order date
   
-### #`orders`
+#### `orders`
 - `order_id`: Unique identifier for each order
 - `customer_id`: Identifier for the customer who placed the order
 - `order_date`: Date when the order was placed
