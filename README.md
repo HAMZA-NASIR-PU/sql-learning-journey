@@ -305,3 +305,95 @@ WHERE email_interactions.last_email_date IS NULL
 ### Conclusion
 
 By using this query, we can effectively manage the email preferences of customers based on their recent interactions, ensuring that inactive customers are appropriately marked. This helps in maintaining an up-to-date and relevant email list for marketing and communication purposes.
+
+
+## CRM - Customer Engagement Score Update
+
+### Overview
+
+In a CRM system, we want to update a customer's engagement score based on a combination of their purchase history, recent interactions, and whether they have referred new customers. The engagement score will be calculated as follows:
+
+1. Increase the score by 10 points for every $500 spent in the last year.
+2. Increase the score by 5 points for each interaction in the last 6 months.
+3. Increase the score by 50 points for each referred customer who has made a purchase.
+
+### Tables
+
+#### `customers`
+- `customer_id`: Unique identifier for each customer
+- `name`: Name of the customer
+- `email`: Email address of the customer
+- `engagement_score`: Score indicating customer engagement
+
+#### `orders`
+- `order_id`: Unique identifier for each order
+- `customer_id`: Identifier for the customer who placed the order
+- `order_date`: Date when the order was placed
+- `total_amount`: Total amount of the order
+
+#### `interactions`
+- `interaction_id`: Unique identifier for each interaction
+- `customer_id`: Identifier for the customer who had the interaction
+- `interaction_type`: Type of interaction (e.g., email, call, chat)
+- `interaction_date`: Date when the interaction occurred
+
+#### `referrals`
+- `referrer_id`: Customer ID of the referrer
+- `referred_id`: Customer ID of the referred customer
+
+```sql
+SET SQL_SAFE_UPDATES = 0;
+UPDATE customers
+JOIN (
+    SELECT 
+        customer_id,
+        SUM(total_amount) AS total_spent,
+        COUNT(*) AS order_count
+    FROM orders
+    WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+    GROUP BY customer_id
+) AS recent_orders ON customers.customer_id = recent_orders.customer_id
+JOIN (
+    SELECT 
+        customer_id,
+        COUNT(*) AS recent_interactions
+    FROM interactions
+    WHERE interaction_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+    GROUP BY customer_id
+) AS recent_interactions ON customers.customer_id = recent_interactions.customer_id
+LEFT JOIN (
+    SELECT 
+        referrer_id,
+        COUNT(*) AS successful_referrals
+    FROM referrals
+    JOIN orders ON referrals.referred_id = orders.customer_id
+    GROUP BY referrer_id
+) AS successful_referrals ON customers.customer_id = successful_referrals.referrer_id
+SET customers.engagement_score = 
+    customers.engagement_score + 
+    COALESCE(FLOOR(recent_orders.total_spent / 500) * 10, 0) + 
+    COALESCE(recent_interactions.recent_interactions * 5, 0) + 
+    COALESCE(successful_referrals.successful_referrals * 50, 0);
+
+```
+
+### Explanation
+
+1. Recent Orders Subquery
+   - Aggregates the total spending and counts the number of orders for each customer in the last year.
+
+2. Recent Interactions Subquery
+   - Counts the number of interactions for each customer in the last 6 months.  
+
+3. Successful Referrals Subquery
+   - Counts the number of successful referrals (referrals where the referred customer has made at least one purchase) for each referrer.
+
+4. Main Query
+   - Joins the customers table with the results of the subqueries.
+   - Uses the SET clause to update the engagement_score based on:
+      - 10 points for every $500 spent in the last year (FLOOR(recent_orders.total_spent / 500) * 10).
+      - 5 points for each recent interaction in the last 6 months (recent_interactions.recent_interactions * 5).
+      - 50 points for each successful referral (successful_referrals.successful_referrals * 50).
+   - The COALESCE function is used to handle NULL values in case a customer has no orders, interactions, or referrals.
+
+This advanced query incorporates multiple data sources and complex conditions to calculate and update the engagement score comprehensively.
