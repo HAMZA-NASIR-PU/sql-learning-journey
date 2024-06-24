@@ -409,7 +409,7 @@ In a CRM system, we want to update a customer's engagement score based on a comb
 ```sql
 SET SQL_SAFE_UPDATES = 0;
 UPDATE customers
-JOIN (
+LEFT JOIN (
     SELECT 
         customer_id,
         SUM(total_amount) AS total_spent,
@@ -418,7 +418,7 @@ JOIN (
     WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
     GROUP BY customer_id
 ) AS recent_orders ON customers.customer_id = recent_orders.customer_id
-JOIN (
+LEFT JOIN (
     SELECT 
         customer_id,
         COUNT(*) AS recent_interactions
