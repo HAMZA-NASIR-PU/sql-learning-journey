@@ -447,7 +447,7 @@ Using LEFT JOIN ensures that customers who haven't made any purchases, had any i
 ### Key Points
 
 - Using LEFT JOIN: Ensures all customers are considered, even those without corresponding records in the joined tables.
-- 
+ 
 - Using COALESCE: Handles NULL values by replacing them with 0 to ensure accurate calculations.
 
 ### Explanation
