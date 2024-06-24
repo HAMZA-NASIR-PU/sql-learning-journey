@@ -442,6 +442,8 @@ SET customers.engagement_score =
 
 ```
 
+Using LEFT JOIN ensures that customers who haven't made any purchases, had any interactions, or referred any customers are still included in the update with default values (such as zero or NULL).
+
 ### Explanation
 
 1. Recent Orders Subquery
