@@ -1,11 +1,11 @@
 # sql-learning-journey
 
-## Learning Resources
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> Learning Resources
 [techTFQ SQL For Beginners](https://www.youtube.com/watch?v=a-hFbr-4VQQ&list=PLavw5C92dz9Ef4E-1Zi9KfCTXS_IN8gXZ)
 
 [Secret To Optimizing SQL Queries - Understand The SQL Execution Order](https://www.youtube.com/watch?v=BHwzDmr6d7s)
 
-## Mastering SQL Joins: Avoiding Common Pitfalls
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> Mastering SQL Joins: Avoiding Common Pitfalls
 
 In SQL, understanding the nuances between different types of joins can significantly impact the results of your queries. One common misconception revolves around the distinction between LEFT JOIN and INNER JOIN, particularly when adding conditions that involve the right table. Let's delve into this issue with a practical example.
 
@@ -47,7 +47,7 @@ FROM orders o
 LEFT JOIN (SELECT c.* FROM customers c WHERE c.status = 'active') AS active_customers ON o.customer_id = active_customers.customer_id;
 ```
 
-## Order of execution of a SQL Query
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> Order of execution of a SQL Query
 
 Consider the following sql query:
 
@@ -119,9 +119,74 @@ ORDER BY
    - Sort the final results by average salary in descending order.
 
 
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM System - Find customers that bought product A and B but not C
+
+In this example, we demonstrate how to find customers from `customers` table that bought product `A` and `B` but not `C` in a Customer Relationship Management (CRM) system.
+
+```sql
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(100),
+    email VARCHAR(100)
+);
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    product_name VARCHAR(100),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
 
 
-## CRM System - Update Customer Information Based on Recent Orders
+INSERT INTO customers (customer_id, customer_name, email) VALUES
+(1, 'Customer A', 'Email A'),
+(2, 'Customer B', 'EmailB'),
+(3, 'Customer C', 'Email C'),
+(4, 'Customer D', 'Email D');
+
+
+INSERT INTO orders (order_id, customer_id, product_name) VALUES
+(101, 1, 'A'),  
+(102, 1, 'B'),
+(103, 1, 'C'),
+(104, 2, 'B'),
+(105, 2, 'C'),
+(106, 3, 'A'),
+(107, 3, 'B');
+```
+
+### Solution 
+
+```sql
+SELECT customers.customer_id, customers.customer_name, customers.email,
+       IFNULL(a.product_a_count, 0) AS product_a_count,
+       IFNULL(b.product_b_count, 0) AS product_b_count,
+       IFNULL(c.product_c_count, 0) AS product_c_count
+FROM customers 
+LEFT JOIN (
+    SELECT customer_id, COUNT(*) AS product_a_count
+    FROM orders
+    WHERE product_name = 'A'
+    GROUP BY customer_id
+) a ON customers.customer_id = a.customer_id
+LEFT JOIN (
+    SELECT customer_id, COUNT(*) AS product_b_count
+    FROM orders
+    WHERE product_name = 'B'
+    GROUP BY customer_id
+) b ON customers.customer_id = b.customer_id
+LEFT JOIN (
+    SELECT customer_id, COUNT(*) AS product_c_count
+    FROM orders
+    WHERE product_name = 'C'
+    GROUP BY customer_id
+) c ON customers.customer_id = c.customer_id
+WHERE IFNULL(a.product_a_count, 0) > 0
+  AND IFNULL(b.product_b_count, 0) > 0
+  AND IFNULL(c.product_c_count, 0) = 0;
+```
+
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM System - Update Customer Information Based on Recent Orders
 
 ### Overview
 
@@ -197,7 +262,7 @@ After running the update, the `customers` table will be updated to:
 This query efficiently updates the `last_order_date` for each customer to reflect their most recent order, ensuring that the `customers` table always has the latest information.
 
 
-## CRM System - Customer Status Update
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM System - Customer Status Update
 
 This explains how to update the status of customers in a Customer Relationship Management (CRM) system to "VIP" if their total spending exceeds a certain amount (e.g., $10,000). The process involves using an SQL `UPDATE` query with a `JOIN` in MySQL.
 
@@ -272,7 +337,7 @@ After running the update, the `customers` table will be updated to:
 
 This SQL query helps in efficiently updating customer statuses based on their spending. Modify the threshold value as per your requirements to categorize customers as "VIP" or any other status.
 
-## CRM System - Updating Email Preferences Based on Customer Interactions
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM System - Updating Email Preferences Based on Customer Interactions
 
 ### Introduction
 
@@ -307,7 +372,7 @@ WHERE email_interactions.last_email_date IS NULL
 By using this query, we can effectively manage the email preferences of customers based on their recent interactions, ensuring that inactive customers are appropriately marked. This helps in maintaining an up-to-date and relevant email list for marketing and communication purposes.
 
 
-## CRM - Customer Engagement Score Update
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM - Customer Engagement Score Update
 
 ### Overview
 
