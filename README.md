@@ -155,7 +155,7 @@ INSERT INTO orders (order_id, customer_id, product_name) VALUES
 (107, 3, 'B');
 ```
 
-### Solution 
+### Solution 1
 
 ```sql
 SELECT customers.customer_id, customers.customer_name, customers.email,
@@ -184,6 +184,44 @@ LEFT JOIN (
 WHERE IFNULL(a.product_a_count, 0) > 0
   AND IFNULL(b.product_b_count, 0) > 0
   AND IFNULL(c.product_c_count, 0) = 0;
+```
+
+### Solution 2
+
+```sql
+SELECT 
+    c.customer_id,
+    c.customer_name,
+    COALESCE(SUM(CASE WHEN o.product_name = 'A' THEN 1 ELSE 0 END), 0) AS product_A_count,
+    COALESCE(SUM(CASE WHEN o.product_name = 'B' THEN 1 ELSE 0 END), 0) AS product_B_count,
+    COALESCE(SUM(CASE WHEN o.product_name = 'C' THEN 1 ELSE 0 END), 0) AS product_C_count
+FROM 
+    customers c
+LEFT JOIN 
+    orders o ON c.customer_id = o.customer_id
+GROUP BY 
+    c.customer_id, c.customer_name
+HAVING 
+    product_A_count > 0
+    AND product_B_count > 0
+    AND product_C_count = 0;
+```
+
+To show the count of each product (A, B, and C) bought by every customer, use `CASE` statement inside the `SUM` aggregate function.
+
+```sql
+SELECT 
+    c.customer_id,
+    c.customer_name,
+    COALESCE(SUM(CASE WHEN o.product_name = 'A' THEN 1 ELSE 0 END), 0) AS product_A_count,
+    COALESCE(SUM(CASE WHEN o.product_name = 'B' THEN 1 ELSE 0 END), 0) AS product_B_count,
+    COALESCE(SUM(CASE WHEN o.product_name = 'C' THEN 1 ELSE 0 END), 0) AS product_C_count
+FROM 
+    customers c
+LEFT JOIN 
+    orders o ON c.customer_id = o.customer_id
+GROUP BY 
+    c.customer_id, c.customer_name;
 ```
 
 ## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM System - Update Customer Information Based on Recent Orders
