@@ -444,6 +444,12 @@ SET customers.engagement_score =
 
 Using LEFT JOIN ensures that customers who haven't made any purchases, had any interactions, or referred any customers are still included in the update with default values (such as zero or NULL).
 
+### Key Points
+
+- Using LEFT JOIN: Ensures all customers are considered, even those without corresponding records in the joined tables.
+- 
+- Using COALESCE: Handles NULL values by replacing them with 0 to ensure accurate calculations.
+
 ### Explanation
 
 1. Recent Orders Subquery
