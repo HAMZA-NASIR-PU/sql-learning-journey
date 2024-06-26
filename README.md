@@ -508,3 +508,91 @@ Using LEFT JOIN ensures that customers who haven't made any purchases, had any i
    - The COALESCE function is used to handle NULL values in case a customer has no orders, interactions, or referrals.
 
 This advanced query incorporates multiple data sources and complex conditions to calculate and update the engagement score comprehensively.
+
+
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM - Customer Segmentation and Tier Update
+
+### Overview
+
+In this scenario, we want to update the tier of customers based on their purchase history, interaction frequency, and whether they have an active subscription. The tiers are defined as follows:
+
+- Platinum: Customers who have spent more than $5,000 in the last year, have had more than 20 interactions in the last 6 months, and have an active subscription.
+- Gold: Customers who have spent between $2,000 and $5,000 in the last year, have had more than 10 interactions in the last 6 months, or have an active subscription.
+- Silver: Customers who have spent between $500 and $2,000 in the last year, or have had more than 5 interactions in the last 6 months.
+- Bronze: All other customers.
+
+### Tables
+
+#### `customers`
+- `customer_id`: Unique identifier for each customer
+- `name`: Name of the customer
+- `tier`: Email address of the customer
+- `subscription_status`: values: 'active', 'inactive'
+  
+#### `orders`
+- `order_id`: Unique identifier for each order
+- `customer_id`: Identifier for the customer who placed the order
+- `order_date`: Date when the order was placed
+- `total_amount`: Total amount of the order
+
+#### `interactions`
+- `interaction_id`: Unique identifier for each interaction
+- `customer_id`: Identifier for the customer who had the interaction
+- `interaction_type`: Type of interaction (e.g., email, call, chat)
+- `interaction_date`: Date when the interaction occurred
+
+
+```sql
+UPDATE customers
+LEFT JOIN (
+    SELECT 
+        customer_id,
+        SUM(total_amount) AS total_spent
+    FROM orders
+    WHERE order_date >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+    GROUP BY customer_id
+) AS recent_orders ON customers.customer_id = recent_orders.customer_id
+LEFT JOIN (
+    SELECT 
+        customer_id,
+        COUNT(*) AS recent_interactions
+    FROM interactions
+    WHERE interaction_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH)
+    GROUP BY customer_id
+) AS recent_interactions ON customers.customer_id = recent_interactions.customer_id
+SET customers.tier = CASE
+    WHEN recent_orders.total_spent > 5000 
+         AND recent_interactions.recent_interactions > 20 
+         AND customers.subscription_status = 'active' 
+        THEN 'Platinum'
+    WHEN recent_orders.total_spent BETWEEN 2000 AND 5000 
+         AND (recent_interactions.recent_interactions > 10 
+              OR customers.subscription_status = 'active')
+        THEN 'Gold'
+    WHEN recent_orders.total_spent BETWEEN 500 AND 2000 
+         OR recent_interactions.recent_interactions > 5
+        THEN 'Silver'
+    ELSE 'Bronze'
+END;
+```
+
+
+### Explanation
+
+1. Recent Orders Subquery
+   - Aggregates the total spending for each customer in the last year.
+
+2. Recent Interactions Subquery
+   - Counts the number of interactions for each customer in the last 6 months.
+
+3. Main Query
+   - Joins the customers table with the results of the subqueries.
+   - Uses a CASE statement to determine the tier of each customer based on:
+      - Platinum: Spending > $5,000, > 20 interactions in the last 6 months, and an active subscription.
+      - Gold: Spending between $2,000 and $5,000, and either > 10 interactions or an active subscription.
+      - Silver: Spending between $500 and $2,000, or > 5 interactions.
+      - Bronze: All other customers.
+   - The LEFT JOIN ensures all customers are included even if they have no orders or interactions.
+
+
+This query segments customers into different tiers based on complex conditions involving their purchase behavior, interaction frequency, and subscription status. It is a typical example of how CRM systems can leverage SQL for advanced customer analytics and segmentation.
