@@ -598,7 +598,7 @@ END;
 This query segments customers into different tiers based on complex conditions involving their purchase behavior, interaction frequency, and subscription status. It is a typical example of how CRM systems can leverage SQL for advanced customer analytics and segmentation.
 
 
-## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> Leetcode - 182. Duplicate Emails
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> Leetcode - Problem 182. Duplicate Emails
 
 
 | Id  | email  |
@@ -647,3 +647,55 @@ Each of these solutions will return:
 | Email          |
 |----------------|
 | john@example.com |
+
+
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> LeetCode - Problem 2837: Total Traveled Distance
+
+
+### Overview
+
+You are given two tables: Users and Rides. Users contains user_id and user_name, while Rides contains ride_id, user_id, and distance traveled.
+
+Write an SQL query to report the total distance traveled by each user. If a user has no recorded rides, return 0 as the total_distance.
+
+
+### Tables
+
+#### `Users`
+- `user_id`: Unique identifier for each user
+- `user_name`: Name of the user
+  
+#### `Rides`
+- `ride_id`: Unique identifier for each ride
+- `user_id`: Identifier for the user who took the ride
+- `distance`: Distance traveled in the ride
+
+
+| user_id	| user_name |
+|-------------|-----------------|
+| 1	| Alice |
+| 2	| Bob |
+| 3	| Charlie |
+
+
+ride_id  |	user_id |	distance |
+|-------------|-----------------|-----------------|
+| 1 |	1 |	10 |
+| 2 |	1 |	15 |
+| 3 |	2 |	20 |
+
+
+### Solution
+
+```sql
+SELECT t1.user_id, 
+       COALESCE(t2.total_distance, 0) AS total_distance 
+FROM Users t1 
+LEFT JOIN (
+    SELECT user_id, SUM(distance) AS total_distance 
+    FROM Rides 
+    GROUP BY user_id
+) AS t2 ON t1.user_id = t2.user_id;
+```
+
+
