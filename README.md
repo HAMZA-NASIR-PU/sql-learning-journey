@@ -602,7 +602,7 @@ This query segments customers into different tiers based on complex conditions i
 
 
 | Id  | email  |
-|-------------|------|-------|-----------------|
+|-------------|-----------------|
 | 1           | john@example.com     |
 | 2           | bob@example.com     |
 | 3           | john@example.com     |
