@@ -873,4 +873,108 @@ LEFT JOIN shipments s ON o.order_id = s.order_id
 WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR);
 ```
 
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM System - Get the total amount and payment of each customer (Using COALESCE in SELECT Statements to Handle NULL Values in CRM Data)
 
+You have a CRM database with tables for `customers`, `orders`, and `payments`. You want to get the total amount and total payment of each customer.
+
+The CRM system consists of two tables:
+
+#### `customers`
+- `id`: Unique identifier for each customer
+- `name`: Name of the customer
+
+#### `orders`
+- `id`: Unique identifier for each order
+- `customer_id`: Identifier for the customer who placed the order
+- `amount`: amount of the order
+
+#### `payments`
+- `id`: Unique identifier for each payment
+- `customer_id`: Identifier for the customer who placed the payment
+- `amount`: Total payment
+
+
+```sql
+-- Create customers table
+CREATE TABLE customers (
+    id INT PRIMARY KEY,
+    name VARCHAR(100)
+);
+
+-- Create orders table
+CREATE TABLE orders (
+    id INT PRIMARY KEY,
+    customer_id INT,
+    amount DECIMAL(10, 2),
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
+-- Create payments table
+CREATE TABLE payments (
+    id INT PRIMARY KEY,
+    customer_id INT,
+    amount DECIMAL(10, 2),
+    FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+-- Insert customers
+INSERT INTO customers (id, name) VALUES
+    (1, 'John'),
+    (2, 'Alice'),
+    (3, 'Bob'),
+    (4, 'Emma');
+
+-- Insert orders
+INSERT INTO orders (id, customer_id, amount) VALUES
+    (1, 1, 100.00),
+    (2, 1, 50.00),
+    (3, 2, 75.00);
+
+-- Insert payments
+INSERT INTO payments (id, customer_id, amount) VALUES
+    (1, 1, 120.00),
+    (2, 2, 80.00);
+```
+
+### Solution
+
+```sql
+SELECT
+    c.id AS customer_id,
+    c.name AS customer_name,
+    COALESCE(SUM(o.amount), 0) AS total_orders,
+    COALESCE(SUM(p.amount), 0) AS total_payments
+FROM
+    customers c
+LEFT JOIN
+    orders o ON c.id = o.customer_id
+LEFT JOIN
+    payments p ON c.id = p.customer_id
+GROUP BY
+    c.id, c.name;
+```
+
+#### Customers
+
+| id | name  |
+|----|-------|
+| 1  | John  |
+| 2  | Alice |
+| 3  | Bob   |
+| 4  | Emma  |
+
+
+#### orders
+
+| id | customer_id | amount |
+|----|-------------|--------|
+| 1  | 1           | 100.00 |
+| 2  | 1           | 50.00  |
+| 3  | 2           | 75.00  |
+
+
+#### payments
+
+| id | customer_id | amount |
+|----|-------------|--------|
+| 1  | 1           | 120.00 |
+| 2  | 2           | 80.00  |
