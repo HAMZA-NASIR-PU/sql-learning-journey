@@ -935,6 +935,31 @@ INSERT INTO payments (id, customer_id, amount) VALUES
     (2, 2, 80.00);
 ```
 
+####  ustomers
+
+| id | name  |
+|----|-------|
+| 1  | John  |
+| 2  | Alice |
+| 3  | Bob   |
+| 4  | Emma  |
+
+
+#### orders
+
+| id | customer_id | amount |
+|----|-------------|--------|
+| 1  | 1           | 100.00 |
+| 2  | 1           | 50.00  |
+| 3  | 2           | 75.00  |
+
+#### payments
+
+| id | customer_id | amount |
+|----|-------------|--------|
+| 1  | 1           | 120.00 |
+| 2  | 2           | 80.00  |
+
 ### Solution
 
 ```sql
@@ -953,28 +978,4 @@ GROUP BY
     c.id, c.name;
 ```
 
-#### Customers
 
-| id | name  |
-|----|-------|
-| 1  | John  |
-| 2  | Alice |
-| 3  | Bob   |
-| 4  | Emma  |
-
-
-#### orders
-
-| id | customer_id | amount |
-|----|-------------|--------|
-| 1  | 1           | 100.00 |
-| 2  | 1           | 50.00  |
-| 3  | 2           | 75.00  |
-
-
-#### payments
-
-| id | customer_id | amount |
-|----|-------------|--------|
-| 1  | 1           | 120.00 |
-| 2  | 2           | 80.00  |
