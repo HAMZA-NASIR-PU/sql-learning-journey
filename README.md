@@ -698,4 +698,78 @@ LEFT JOIN (
 ) AS t2 ON t1.user_id = t2.user_id;
 ```
 
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM System - Cleanup Orders and Related Shipments for Inactive Customers
+
+
+In a CRM system, we want to clean up records related to customers who have been inactive for more than 3 years. Specifically, we need to delete such customers along with their associated orders and shipments.
+
+
+```sql
+-- Creating tables
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(255),
+    last_order_date DATE
+);
+
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE,
+    total_amount DECIMAL(10, 2),
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
+CREATE TABLE shipments (
+    shipment_id INT PRIMARY KEY,
+    order_id INT,
+    shipment_date DATE,
+    status VARCHAR(255),
+    FOREIGN KEY (order_id) REFERENCES orders(order_id)
+);
+
+-- Inserting data into customers
+INSERT INTO customers (customer_id, name, last_order_date) VALUES
+(1, 'Alice Johnson', '2020-04-20'),
+(2, 'Bob Smith', '2021-06-15'),
+(3, 'Charlie Brown', '2019-09-10'),
+(4, 'Diana Prince', '2022-01-05'),
+(5, 'Eve Davis', '2018-11-23');
+
+-- Inserting data into orders
+INSERT INTO orders (order_id, customer_id, order_date, total_amount) VALUES
+(101, 1, '2020-04-18', 250.00),
+(102, 2, '2021-06-10', 150.00),
+(103, 3, '2019-08-25', 300.00),
+(104, 4, '2022-01-03', 100.00),
+(105, 5, '2018-11-20', 500.00);
+
+-- Inserting data into shipments
+INSERT INTO shipments (shipment_id, order_id, shipment_date, status) VALUES
+(201, 101, '2020-04-19', 'Delivered'),
+(202, 102, '2021-06-12', 'Shipped'),
+(203, 103, '2019-08-30', 'Delivered'),
+(204, 104, '2022-01-07', 'In Transit'),
+(205, 105, '2018-11-25', 'Delivered');
+```
+
+```sql
+DELETE c, o, s
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+LEFT JOIN shipments s ON o.order_id = s.order_id
+WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR);
+```
+
+### Explanation:
+
+- `DELETE c, o, s`: Specifies that we want to delete from the `customers`, `orders`, and `shipments` tables.
+- `FROM customers c`: Specifies the primary table (`customers`) from which to start.
+- `LEFT JOIN orders o ON c.customer_id = o.customer_id`: Joins the `customers` table with the `orders` table on the customer_id.
+- `LEFT JOIN shipments s ON o.order_id = s.order_id`: Joins the `orders` table with the `shipments` table on the order_id.
+- `WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR)`: Adds a condition to delete only those customers who have not placed any orders in the last 3 years.
+
+### Outcome:
+
+After executing the DELETE query, Alice Johnson (customer_id = 1), Charlie Brown (customer_id = 3), and Eve Davis (customer_id = 5), along with their related orders (order_id = 101, 103, 105) and shipments (shipment_id = 201, 203, 205), will be deleted from the `customers`, `orders`, and `shipments` tables.
 
