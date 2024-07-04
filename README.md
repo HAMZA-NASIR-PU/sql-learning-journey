@@ -792,6 +792,14 @@ LEFT JOIN shipments s ON o.order_id = s.order_id
 WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR);
 ```
 
+### Explanation:
+
+- `DELETE c, o, s`: Specifies that we want to delete from the `customers`, `orders`, and `shipments` tables.
+- `FROM customers c`: Specifies the primary table (`customers`) from which to start.
+- `LEFT JOIN orders o ON c.customer_id = o.customer_id`: Joins the `customers` table with the `orders` table on the customer_id.
+- `LEFT JOIN shipments s ON o.order_id = s.order_id`: Joins the `orders` table with the `shipments` table on the order_id.
+- `WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR)`: Adds a condition to delete only those customers who have not placed any orders in the last 3 years.
+
 ### Referential Integrity Issue
 
 `Error Code: 1451. Cannot delete or update a parent row: a foreign key constraint fails (my_db.orders, CONSTRAINT orders_ibfk_1 FOREIGN KEY (customer_id) REFERENCES customers (customer_id))`
@@ -828,17 +836,9 @@ SET SQL_SAFE_UPDATES = 1;
 In MySQL, `ON DELETE CASCADE` is a referential action that can be specified when defining a foreign key constraint between two tables. It defines what action MySQL should take when a row in the parent (referenced) table is deleted.
 Here's what ON DELETE CASCADE specifically does:
 
-`Cascade Deletion`: When a row in the parent table (referenced by the foreign key) is deleted, MySQL automatically deletes all rows in the child table (that contains the foreign key) that reference the deleted row in the parent table.
+- `Cascade Deletion`: When a row in the parent table (referenced by the foreign key) is deleted, MySQL automatically deletes all rows in the child table (that contains the foreign key) that reference the deleted row in the parent table.
 
-`Maintains Referential Integrity`: This ensures that the relationship between the tables remains valid, as deleting a parent record would naturally require deletion of related child records to avoid orphaned references.
-
-### Explanation:
-
-- `DELETE c, o, s`: Specifies that we want to delete from the `customers`, `orders`, and `shipments` tables.
-- `FROM customers c`: Specifies the primary table (`customers`) from which to start.
-- `LEFT JOIN orders o ON c.customer_id = o.customer_id`: Joins the `customers` table with the `orders` table on the customer_id.
-- `LEFT JOIN shipments s ON o.order_id = s.order_id`: Joins the `orders` table with the `shipments` table on the order_id.
-- `WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR)`: Adds a condition to delete only those customers who have not placed any orders in the last 3 years.
+- `Maintains Referential Integrity`: This ensures that the relationship between the tables remains valid, as deleting a parent record would naturally require deletion of related child records to avoid orphaned references.
 
 ### Outcome:
 
