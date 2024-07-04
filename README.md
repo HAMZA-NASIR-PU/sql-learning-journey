@@ -877,7 +877,7 @@ WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR);
 
 You have a CRM database with tables for `customers`, `orders`, and `payments`. You want to get the total amount and total payment of each customer.
 
-The CRM system consists of two tables:
+The CRM system consists of three tables:
 
 #### `customers`
 - `id`: Unique identifier for each customer
