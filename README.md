@@ -784,12 +784,53 @@ INSERT INTO shipments (shipment_id, order_id, shipment_date, status) VALUES
 ```
 
 ```sql
+SET SQL_SAFE_UPDATES = 0;
 DELETE c, o, s
 FROM customers c
 LEFT JOIN orders o ON c.customer_id = o.customer_id
 LEFT JOIN shipments s ON o.order_id = s.order_id
 WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR);
 ```
+
+### Referential Integrity Issue
+
+`Error Code: 1451. Cannot delete or update a parent row: a foreign key constraint fails (my_db.orders, CONSTRAINT orders_ibfk_1 FOREIGN KEY (customer_id) REFERENCES customers (customer_id))`
+
+The error you're encountering is due to the foreign key constraint between the orders and customers tables. When you try to delete a customer that has corresponding orders, the foreign key constraint prevents the deletion to maintain referential integrity.
+To work around this, you need to delete the dependent rows in the orders and shipments tables before deleting the rows in the customers table.You can do this by using multiple DELETE statements or by modifying the foreign key constraints to include ON DELETE CASCADE. Here, I'll provide an example with multiple DELETE statements:
+
+```sql
+-- Disable safe update mode
+SET SQL_SAFE_UPDATES = 0;
+
+-- Delete from shipments table first
+DELETE s
+FROM shipments s
+JOIN orders o ON s.order_id = o.order_id
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR);
+
+-- Delete from orders table next
+DELETE o
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR);
+
+-- Finally, delete from customers table
+DELETE c
+FROM customers c
+WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR);
+
+-- Re-enable safe update mode
+SET SQL_SAFE_UPDATES = 1;
+```
+
+In MySQL, `ON DELETE CASCADE` is a referential action that can be specified when defining a foreign key constraint between two tables. It defines what action MySQL should take when a row in the parent (referenced) table is deleted.
+Here's what ON DELETE CASCADE specifically does:
+
+`Cascade Deletion`: When a row in the parent table (referenced by the foreign key) is deleted, MySQL automatically deletes all rows in the child table (that contains the foreign key) that reference the deleted row in the parent table.
+
+`Maintains Referential Integrity`: This ensures that the relationship between the tables remains valid, as deleting a parent record would naturally require deletion of related child records to avoid orphaned references.
 
 ### Explanation:
 
