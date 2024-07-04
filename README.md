@@ -393,7 +393,23 @@ In this example, we want to update the email preferences of customers based on t
 - `interaction_type`: email/phone/chat
 - `interaction_date`: Date on which a particular interaction taken place.
 
-#### Solution
+### Solution 1
+
+```sql
+UPDATE customers t3
+LEFT JOIN (
+    SELECT customer_id
+    FROM interactions
+    WHERE interaction_type = 'email'
+      AND interaction_date > DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+) t1 ON t3.customer_id = t1.customer_id
+SET t3.email_preference = CASE
+    WHEN t1.customer_id IS NULL THEN 'inactive'
+    ELSE 'active'
+END;
+```
+
+#### Solution 2
 
 ```sql
 UPDATE customers
