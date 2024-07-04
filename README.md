@@ -763,7 +763,8 @@ INSERT INTO customers (customer_id, name, last_order_date) VALUES
 (2, 'Bob Smith', '2021-06-15'),
 (3, 'Charlie Brown', '2019-09-10'),
 (4, 'Diana Prince', '2022-01-05'),
-(5, 'Eve Davis', '2018-11-23');
+(5, 'Eve Davis', '2018-11-23'),
+(6, 'Ricardo Diaz', '2018-11-23');
 
 -- Inserting data into orders
 INSERT INTO orders (order_id, customer_id, order_date, total_amount) VALUES
