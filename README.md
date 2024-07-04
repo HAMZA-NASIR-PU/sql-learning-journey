@@ -802,3 +802,17 @@ WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR);
 
 After executing the DELETE query, Alice Johnson (customer_id = 1), Charlie Brown (customer_id = 3), and Eve Davis (customer_id = 5), along with their related orders (order_id = 101, 103, 105) and shipments (shipment_id = 201, 203, 205), will be deleted from the `customers`, `orders`, and `shipments` tables.
 
+
+However, it's good to note that the DELETE statement with JOIN should be used carefully because it will delete records from all the tables mentioned. Make sure you have backups or are certain about the data you are deleting.
+
+For clarity and safety, especially in a production environment, it is often a good idea to test your DELETE statement with a SELECT statement first to ensure it is targeting the correct records:
+
+```sql
+SELECT c.*, o.*, s.*
+FROM customers c
+LEFT JOIN orders o ON c.customer_id = o.customer_id
+LEFT JOIN shipments s ON o.order_id = s.order_id
+WHERE c.last_order_date < DATE_SUB(NOW(), INTERVAL 3 YEAR);
+```
+
+
