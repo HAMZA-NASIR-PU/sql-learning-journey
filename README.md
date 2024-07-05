@@ -983,7 +983,7 @@ GROUP BY
 
 ### Scenario
 
-In a sales management system, you have two tables: salespeople and sales. You need to update the commission rate of salespeople based on their sales performance over the last quarter. Specifically, if a salesperson has sold more than $10,000 worth of products in the last quarter, their commission rate should be increased by 2%.
+In a sales management system, you have three tables: `salespeople`, `sales`, and `products`. You need to update the commission rate of salespeople based on their sales performance over the last quarter. Specifically, if a salesperson has sold more than $10,000 worth of products in the last quarter, their commission rate should be increased by 2%.
 
 ### Tables
 
@@ -999,12 +999,12 @@ In a sales management system, you have two tables: salespeople and sales. You ne
 - `product_id`: Identifier for the product sold
 - `quantity`: Quantity of the product sold
 
-#### products`
+#### `products`
 - `product_id`: Unique identifier for each product
 - `product_name`: Name of the product
 - `price`: Price of the product
 
-### Solution
+### Solution 1
 
 ```sql
 UPDATE salespeople t3
@@ -1021,6 +1021,22 @@ SET t3.commission_rate = CASE
 END;
 ```
 
+### Solution 2
+
+```sql
+UPDATE salespeople sp
+JOIN (
+    SELECT s.salesperson_id, SUM(p.price * s.quantity) AS total_sales
+    FROM sales s
+    JOIN products p ON s.product_id = p.product_id
+    WHERE s.sale_date >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+    GROUP BY s.salesperson_id
+    HAVING total_sales > 10000
+) sales_summary ON sp.salesperson_id = sales_summary.salesperson_id
+SET sp.commission_rate = sp.commission_rate + 2.00
+WHERE sp.commission_rate <= 10.00;
+```
+
 ### Explanation
 
 1. Inner Query
@@ -1034,7 +1050,4 @@ END;
    - It joins the salespeople table with the result of the subquery (t4) on salesperson_id.
    - The SET clause uses a CASE statement to update the commission_rate. If the total_sales exceeds $10,000, it increases the commission_rate by 2. Otherwise, it keeps the current commission_rate.
 
-### Conclusion
-
-This query efficiently updates the commission rates of salespeople based on their recent sales performance, ensuring that those who have sold more than $10,000 worth of products in the last quarter receive a 2% increase in their commission rate.
 
