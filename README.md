@@ -979,3 +979,62 @@ GROUP BY
 ```
 
 
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM System - Adjusting Salesperson Commission Based on Recent Sales in a Sales Management System
+
+### Scenario
+
+In a sales management system, you have two tables: salespeople and sales. You need to update the commission rate of salespeople based on their sales performance over the last quarter. Specifically, if a salesperson has sold more than $10,000 worth of products in the last quarter, their commission rate should be increased by 2%.
+
+### Tables
+
+#### `salespeople`
+- `salesperson_id`: Unique identifier for each salesperson
+- `name`: Name of the salesperson
+- `commission_rate`: Current commission rate as a percentage
+
+#### `sales`
+- `sale_id: Unique identifier for each sale
+- `salesperson_id`: Identifier for the salesperson who made the sale
+- `sale_date`: Date when the sale was made
+- `product_id`: Identifier for the product sold
+- `quantity`: Quantity of the product sold
+
+#### products`
+- `product_id`: Unique identifier for each product
+- `product_name`: Name of the product
+- `price`: Price of the product
+
+### Solution
+
+```sql
+UPDATE salespeople t3
+JOIN (
+    SELECT t1.salesperson_id, SUM(t2.price * t1.quantity) AS total_sales
+    FROM sales t1
+    JOIN products t2 ON t1.product_id = t2.product_id
+    WHERE t1.sale_date >= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)
+    GROUP BY t1.salesperson_id
+) AS t4 ON t3.salesperson_id = t4.salesperson_id
+SET t3.commission_rate = CASE
+    WHEN t4.total_sales > 10000 THEN t3.commission_rate + 2
+    ELSE t3.commission_rate
+END;
+```
+
+### Explanation
+
+1. Inner Query
+   - The subquery calculates the total sales amount for each salesperson over the last three months.
+   - It joins the sales table (t1) with the products table (t2) on product_id.
+   - It filters the sales records to include only those within the last three months using DATE_SUB(CURDATE(), INTERVAL 3 MONTH).
+   - The SUM function calculates the total sales amount by multiplying the price of each product by the quantity sold.
+   - The GROUP BY clause groups the results by salesperson_id.
+2. Update Statement
+   - The UPDATE statement targets the salespeople table (t3).
+   - It joins the salespeople table with the result of the subquery (t4) on salesperson_id.
+   - The SET clause uses a CASE statement to update the commission_rate. If the total_sales exceeds $10,000, it increases the commission_rate by 2. Otherwise, it keeps the current commission_rate.
+
+### Conclusion
+
+This query efficiently updates the commission rates of salespeople based on their recent sales performance, ensuring that those who have sold more than $10,000 worth of products in the last quarter receive a 2% increase in their commission rate.
+
