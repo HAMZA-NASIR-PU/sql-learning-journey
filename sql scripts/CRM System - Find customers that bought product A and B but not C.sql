@@ -1,3 +1,4 @@
+DROP DATABASE IF EXISTS `crm-sql-prep`;
 CREATE DATABASE `crm-sql-prep`;
 USE `crm-sql-prep`;
 
