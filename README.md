@@ -1050,7 +1050,7 @@ WHERE sp.commission_rate <= 10.00;
    - It joins the salespeople table with the result of the subquery (t4) on salesperson_id.
    - The SET clause uses a CASE statement to update the commission_rate. If the total_sales exceeds $10,000, it increases the commission_rate by 2. Otherwise, it keeps the current commission_rate.
 
-## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> ERP System - Calculating Employee Absence Days Excluding Weekends in an ERP System
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> ERP System - Calculating Weekdays and Weekends for Leave Requests
 
 ### Scenario
 
@@ -1058,38 +1058,43 @@ In an ERP system for a company, we need to calculate the total number of days an
 Let's consider a company with an ERP system that tracks employee leaves. Employee John Doe takes a leave from July 1, 2024, to July 15, 2024. We need to determine the total number of working days he is absent, excluding weekends.
 
 ```sql
-CREATE TABLE employee_leaves (
+CREATE TABLE leave_request (
+    id INT PRIMARY KEY,
     employee_id INT,
-    employee_name VARCHAR(50),
-    start_date DATE,
-    end_date DATE
+    start_date DATETIME,
+    end_date DATETIME,
+    leave_type VRACHAR(255)
 );
 
-INSERT INTO employee_leaves (employee_id, employee_name, start_date, end_date)
-VALUES 
-(1, 'John Doe', '2024-07-01', '2024-07-15');
+WITH RECURSIVE leave_days AS (
+    SELECT start_date AS leave_date, end_date, leave_type FROM leave_request WHERE child_id = 1
+    UNION ALL
+    SELECT DATE_ADD(ld.leave_date, INTERVAL 1 DAY), ld.end_date, ld.leave_type FROM leave_days ld
+    WHERE DATE_ADD(ld.leave_date, INTERVAL 1 DAY) <= ld.end_date
+)
+SELECT leave_type, SUM(CASE WHEN DAYOFWEEK(leave_date) <> 1 AND DAYOFWEEK(leave_date) <> 7 THEN 1 ELSE 0 END) AS week_days_count FROM leave_days GROUP BY leave_type;
+
+WITH RECURSIVE leave_days AS (
+    SELECT start_date AS leave_date, end_date, leave_type FROM leave_request WHERE id = 1
+    UNION ALL
+    SELECT DATE_ADD(ld.leave_date, INTERVAL 1 DAY), ld.end_date, ld.leave_type FROM leave_days ld
+    WHERE DATE_ADD(ld.leave_date, INTERVAL 1 DAY) <= ld.end_date
+)
+SELECT * FROM leave_days ORDER BY leave_date;
+
 ```
 
+### Solution
+
 ```sql
-WITH RECURSIVE date_series AS (
-    SELECT start_date AS leave_date
-    FROM employee_leaves
-    WHERE employee_id = 1
+WITH RECURSIVE leave_days AS (
+    SELECT start_date AS leave_date, end_date, leave_type FROM leave_request WHERE id = 1  -- For a specific Leave Request
     UNION ALL
-    SELECT leave_date + INTERVAL 1 DAY
-    FROM date_series
-    WHERE leave_date + INTERVAL 1 DAY <= (SELECT end_date FROM employee_leaves WHERE employee_id = 1)
-),
-working_days AS (
-    SELECT leave_date
-    FROM date_series
-    WHERE DAYOFWEEK(leave_date) NOT IN (1, 7) -- 1 = Sunday, 7 = Saturday
+    SELECT DATE_ADD(ld.leave_date, INTERVAL 1 DAY), ld.end_date, ld.leave_type FROM leave_days ld
+    WHERE DATE_ADD(ld.leave_date, INTERVAL 1 DAY) <= ld.end_date
 )
-SELECT employee_id, employee_name, COUNT(leave_date) AS total_working_days_absent
-FROM working_days
-JOIN employee_leaves ON working_days.leave_date BETWEEN employee_leaves.start_date AND employee_leaves.end_date
-WHERE employee_id = 1
-GROUP BY employee_id, employee_name;
+SELECT SUM(CASE WHEN DAYOFWEEK(leave_date) <> 1 AND DAYOFWEEK(leave_date) <> 7 THEN 1 ELSE 0 END) "weekdays_count",
+SUM(CASE WHEN DAYOFWEEK(leave_date) <> 1 AND DAYOFWEEK(leave_date) <> 7 THEN 0 ELSE 1 END) "weekends_count" FROM leave_days ORDER BY leave_date;
 ```
 
 
