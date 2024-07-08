@@ -1155,6 +1155,15 @@ FROM company_hierarchy ch
 LEFT JOIN employees e
 ON ch.boss_id = e.id
 ORDER BY ch.hierarchy_level, ch.boss_id;
+
+
+
+WITH RECURSIVE company_hierarchy AS (
+    SELECT e.id, e.first_name, e.last_name, e.boss_id , 0 hierarchy FROM employees e WHERE e.boss_id IS NULL
+    UNION ALL
+    SELECT e.id, e.first_name, e.last_name, e.boss_id , hierarchy + 1 FROM employees e JOIN company_hierarchy ch ON e.boss_id = ch.id
+)
+SELECT * FROM company_hierarchy;
 ```
 
 ### Final Result
