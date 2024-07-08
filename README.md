@@ -1270,3 +1270,8 @@ The recursive CTE treats each row result independently in each iteration. It:
 
 
 This mechanism allows the recursive query to build a comprehensive hierarchy even when multiple employees share the same boss or when there are multiple top-level employees.
+
+
+
+
+https://learnsql.com/blog/do-it-in-sql-recursive-tree-traversal/
