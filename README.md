@@ -1200,9 +1200,68 @@ FROM employees
 WHERE boss_id IS NULL;
      ```
 
-   Given the example data, the initial result set include
+   - Given the example data, the initial result set include:
+     
+     ```sql
+     id: 4, first_name: Roxanna, last_name: Fairlie, boss_id: NULL, hierarchy_level: 0
+     id: 11, first_name: Alice, last_name: Johnson, boss_id: NULL, hierarchy_level: 0
+     ```
 
-    ```sql
-    id: 4, first_name: Roxanna, last_name: Fairlie, boss_id: NULL, hierarchy_level: 0
-    id: 11, first_name: Alice, last_name: Johnson, boss_id: NULL, hierarchy_level: 0
-    ```
+2. First Recursive Step
+   - In the first recursive step, the query looks for employees whose boss_id matches the id of any employee in the initial result set. It processes each of these initial rows independently:
+        ```sql
+        SELECT e.id, e.first_name, e.last_name, e.boss_id, ch.hierarchy_level + 1
+        FROM employees e
+        JOIN company_hierarchy ch ON e.boss_id = ch.id;
+        ```    
+    This step will find:
+        
+        For `Roxanna` (id 4):
+
+            ```sql
+            id: 5, first_name: Hermie, last_name: Comsty, boss_id: 4, hierarchy_level: 1
+            id: 8, first_name: Bobbe, last_name: Blakeway, boss_id: 4, hierarchy_level: 1
+            ```
+        
+        For `Alice` (id 11):
+
+            ```sql
+            id: 12, first_name: Eve, last_name: Smith, boss_id: 11, hierarchy_level: 1
+            id: 13, first_name: John, last_name: Doe, boss_id: 11, hierarchy_level: 
+            ```
+            
+
+3. Subsequent Recursive Steps
+
+    - The process continues recursively. In the next step, the query will process each of the newly added rows independently:
+    
+    For `Hermie` (id 5):
+       
+       ```sql
+       id: 1, first_name: Domenic, last_name: Leaver, boss_id: 5, hierarchy_level: 2
+       id: 7, first_name: Faulkner, last_name: Challiss, boss_id: 5, hierarchy_level: 2
+       ```
+    
+    For `Bobbe` (id 8):
+    
+       ```sql
+       id: 3, first_name: Kakalina, last_name: Atherton, boss_id: 8, hierarchy_level: 2
+       id: 6, first_name: Pooh, last_name: Goss, boss_id: 8, hierarchy_level: 2
+       id: 10, first_name: Augusta, last_name: Gosdin, boss_id: 8, hierarchy_level: 2
+       ```
+       
+   For Eve (id 12) and John (id 13), since they don't have any subordinates, the recursion doesn't add any new rows for them.
+    
+    
+Each iteration of the recursion independently processes each row that was added in the previous step, ensuring that every possible hierarchy level and relationship is explored.
+
+### Summary
+
+The recursive CTE treats each row result independently in each iteration. It:
+
+1. Initializes with the base case (top-level employees).
+2. Recursively finds and processes employees who report to the current set of employees.
+3. Independently processes each row found in the previous step, ensuring all possible hierarchy levels and relationships are correctly identified and added to the result set.
+
+
+This mechanism allows the recursive query to build a comprehensive hierarchy even when multiple employees share the same boss or when there are multiple top-level employees.
