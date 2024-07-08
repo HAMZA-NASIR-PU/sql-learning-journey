@@ -1092,3 +1092,54 @@ WHERE employee_id = 1
 GROUP BY employee_id, employee_name;
 ```
 
+
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> Example 1 – Finding Bosses and Hierarchical Level for All Employees
+
+[Recursive CTE - Learn SQL]([https://www.youtube.com/watch?v=a-hFbr-4VQQ&list=PLavw5C92dz9Ef4E-1Zi9KfCTXS_IN8gXZ](https://learnsql.com/blog/sql-recursive-cte/))
+
+
+```sql
+CREATE TABLE employees (
+    id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    boss_id INT,
+    FOREIGN KEY (boss_id) REFERENCES employees(id)
+);
+
+INSERT INTO employees (id, first_name, last_name, boss_id) VALUES
+(1, 'Domenic', 'Leaver', 5),
+(2, 'Cleveland', 'Hewins', 1),
+(3, 'Kakalina', 'Atherton', 8),
+(4, 'Roxanna', 'Fairlie', NULL),
+(5, 'Hermie', 'Comsty', 4),
+(6, 'Pooh', 'Goss', 8),
+(7, 'Faulkner', 'Challiss', 5),
+(8, 'Bobbe', 'Blakeway', 4),
+(9, 'Laurene', 'Burchill', 1),
+(10, 'Augusta', 'Gosdin', 8),
+(11, 'Alice', 'Johnson', NULL),
+(12, 'Eve', 'Smith', 11),
+(13, 'John', 'Doe', 11);
+```
+
+### Final Result
+
+| employee_first_name | employee_last_name | boss_first_name | boss_last_name | hierarchy_level 
+| --------------------|--------------------|-----------------|----------------|----------------
+| Roxanna             | Fairlie            | NULL            | NULL           | 0
+| Alice               | Johnson            | NULL            | NULL           | 0
+| Hermie              | Comsty             | Roxanna         | Fairlie        | 1
+| Bobbe               | Blakeway           | Roxanna         | Fairlie        | 1
+| Eve                 | Smith              | Alice           | Johnson        | 1
+| John                | Doe                | Alice           | Johnson        | 1
+| Domenic             | Leaver             | Hermie          | Comsty         | 2
+| Faulkner            | Challiss           | Hermie          | Comsty         | 2
+| Kakalina            | Atherton           | Bobbe           | Blakeway       | 2
+| Pooh                | Goss               | Bobbe           | Blakeway       | 2
+| Augusta             | Gosdin             | Bobbe           | Blakeway       | 2
+| Cleveland           | Hewins             | Domenic         | Leaver         | 3
+| Laurene             | Burchill           | Domenic         | Leaver         | 3
+
+
+
