@@ -1123,6 +1123,40 @@ INSERT INTO employees (id, first_name, last_name, boss_id) VALUES
 (13, 'John', 'Doe', 11);
 ```
 
+### Solution
+
+```sql
+WITH RECURSIVE company_hierarchy AS (
+  SELECT    id,
+            first_name,
+            last_name,
+            boss_id,
+        0 AS hierarchy_level
+  FROM employees
+  WHERE boss_id IS NULL
+ 
+  UNION ALL
+   
+  SELECT    e.id,
+            e.first_name,
+            e.last_name,
+            e.boss_id,
+        hierarchy_level + 1
+  FROM employees e, company_hierarchy ch
+  WHERE e.boss_id = ch.id
+)
+ 
+SELECT   ch.first_name AS employee_first_name,
+       ch.last_name AS employee_last_name,
+       e.first_name AS boss_first_name,
+       e.last_name AS boss_last_name,
+       hierarchy_level
+FROM company_hierarchy ch
+LEFT JOIN employees e
+ON ch.boss_id = e.id
+ORDER BY ch.hierarchy_level, ch.boss_id;
+```
+
 ### Final Result
 
 | employee_first_name | employee_last_name | boss_first_name | boss_last_name | hierarchy_level 
@@ -1143,3 +1177,23 @@ INSERT INTO employees (id, first_name, last_name, boss_id) VALUES
 
 
 
+The recursive query works separately for each row result in each iteration of the recursion. Let's delve deeper into how this works.
+
+### Detailed Explanation 
+
+The recursive Common Table Expression (CTE) processes each row independently within each iteration of the recursive step.
+
+1. Initial Population (Base Case)
+   - The base case populates the initial rows where boss_id IS NULL.
+     ```sql
+     SELECT id, first_name, last_name, boss_id, 0 AS hierarchy_level
+FROM employees
+WHERE boss_id IS NULL;
+     ```
+
+   Given the example data, the initial result set include
+
+    ```sql
+    id: 4, first_name: Roxanna, last_name: Fairlie, boss_id: NULL, hierarchy_level: 0
+    id: 11, first_name: Alice, last_name: Johnson, boss_id: NULL, hierarchy_level: 0
+    ```
