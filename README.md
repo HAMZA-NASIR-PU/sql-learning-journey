@@ -1216,14 +1216,14 @@ WHERE boss_id IS NULL;
         ```    
     This step will find:
         
-        For `Roxanna` (id 4):
+    For `Roxanna` (id 4):
 
             ```sql
             id: 5, first_name: Hermie, last_name: Comsty, boss_id: 4, hierarchy_level: 1
             id: 8, first_name: Bobbe, last_name: Blakeway, boss_id: 4, hierarchy_level: 1
             ```
         
-        For `Alice` (id 11):
+    For `Alice` (id 11):
 
             ```sql
             id: 12, first_name: Eve, last_name: Smith, boss_id: 11, hierarchy_level: 1
