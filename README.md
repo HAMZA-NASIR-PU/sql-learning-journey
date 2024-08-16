@@ -1277,3 +1277,122 @@ This mechanism allows the recursive query to build a comprehensive hierarchy eve
 
 
 https://learnsql.com/blog/do-it-in-sql-recursive-tree-traversal/
+
+
+
+## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM – CRM SQL questions that can help evaluate your SQL ability
+
+```sql
+-- Customer Table
+CREATE TABLE Customers (
+    customer_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(100),
+    status VARCHAR(10),  -- 'active' or 'inactive'
+    created_at DATE
+);
+
+-- Product Table
+CREATE TABLE Products (
+    product_id INT PRIMARY KEY,
+    product_name VARCHAR(100),
+    category VARCHAR(50),
+    price DECIMAL(10, 2)
+);
+
+-- Orders Table
+CREATE TABLE Orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE,
+    total_amount DECIMAL(10, 2),
+    sales_rep_id INT,
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id)
+);
+
+-- Order Details Table
+CREATE TABLE OrderDetails (
+    order_detail_id INT PRIMARY KEY,
+    order_id INT,
+    product_id INT,
+    quantity INT,
+    price DECIMAL(10, 2),
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id),
+    FOREIGN KEY (product_id) REFERENCES Products(product_id)
+);
+
+-- Sales Reps Table
+CREATE TABLE SalesReps (
+    sales_rep_id INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    email VARCHAR(100)
+);
+```
+
+
+```sql
+-- Insert Customers
+INSERT INTO Customers (customer_id, first_name, last_name, email, status, created_at) VALUES
+(1, 'John', 'Doe', 'john.doe@example.com', 'active', '2022-05-10'),
+(2, 'Jane', 'Smith', 'jane.smith@example.com', 'active', '2021-03-15'),
+(3, 'Michael', 'Brown', 'michael.brown@example.com', 'inactive', '2020-08-20');
+
+-- Insert Products
+INSERT INTO Products (product_id, product_name, category, price) VALUES
+(1, 'Laptop', 'Electronics', 1200.00),
+(2, 'Headphones', 'Electronics', 150.00),
+(3, 'Coffee Maker', 'Home Appliances', 80.00);
+
+-- Insert Sales Reps
+INSERT INTO SalesReps (sales_rep_id, first_name, last_name, email) VALUES
+(1, 'Sarah', 'Connor', 'sarah.connor@example.com'),
+(2, 'Tom', 'Cruise', 'tom.cruise@example.com');
+
+-- Insert Orders
+INSERT INTO Orders (order_id, customer_id, order_date, total_amount, sales_rep_id) VALUES
+(1, 1, '2023-07-21', 1350.00, 1),
+(2, 2, '2023-06-15', 150.00, 2),
+(3, 1, '2023-08-01', 1200.00, 1);
+
+-- Insert Order Details
+INSERT INTO OrderDetails (order_detail_id, order_id, product_id, quantity, price) VALUES
+(1, 1, 1, 1, 1200.00),
+(2, 1, 2, 1, 150.00),
+(3, 2, 2, 1, 150.00),
+(4, 3, 1, 1, 1200.00);
+```
+
+
+### Retrieve a List of Active Customers
+
+1. Have the status of `active` — This means their status in the Customers table is set to `active`.
+2. Have made at least one purchase in the past year — This means they must have at least one order in the Orders table where the order_date falls within the last year.
+
+
+```sql
+SELECT * 
+FROM Customers 
+WHERE status = 'active' 
+AND customer_id IN (
+    SELECT customer_id 
+    FROM Orders 
+    WHERE order_date >= CURDATE() - INTERVAL 1 YEAR
+);
+```
+
+```sql
+SELECT c.customer_id, IFNULL(last_year_orders.count, 0) AS "Total Orders"
+FROM Customers c
+LEFT JOIN (
+    SELECT o.customer_id, COUNT(*) AS count 
+    FROM Orders o 
+    WHERE o.order_date >= CURDATE() - INTERVAL 1 YEAR 
+    GROUP BY o.customer_id
+) AS last_year_orders
+ON c.customer_id = last_year_orders.customer_id;
+```
+
+
+
