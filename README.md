@@ -1395,4 +1395,82 @@ ON c.customer_id = last_year_orders.customer_id;
 ```
 
 
+# <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM – Counting Orders by Product Category
+
+### Overview
+
+Welcome to this SQL interview practice exercise! In this task, you'll be working with an e-commerce dataset, which contains information about customer orders, including the product categories purchased. Your goal is to write a query that counts the number of orders each customer has placed for specific product categories, ensuring you handle cases where some customers may not have purchased from all categories.
+
+This exercise will help you solidify your understanding of SQL aggregation, conditional logic using `CASE`, and grouping results by specific columns.
+
+### Task Description
+
+You are given an `orders` table that tracks customer purchases. The table has the following structure:
+
+| Column             | Type     | Description                                    |
+|--------------------|----------|------------------------------------------------|
+| `customer_id`       | INT      | The unique identifier for the customer.        |
+| `order_id`          | INT      | The unique identifier for the order.           |
+| `product_category`  | VARCHAR  | The category of the product (e.g., 'Electronics', 'Clothing', etc.). |
+| `order_date`        | DATE     | The date when the order was placed.            |
+
+#### Problem Statement
+
+Write a SQL query that returns the total number of orders placed by each customer for the **'Electronics'** and **'Clothing'** categories. The result should include:
+
+1. **customer_id**: The unique identifier of the customer.
+2. **electronics_order_count**: The total number of orders the customer has placed for the 'Electronics' category.
+3. **clothing_order_count**: The total number of orders the customer has placed for the 'Clothing' category.
+
+Make sure that customers who have not placed any orders in one of the categories still appear in the result, with a count of **0** for that category.
+
+#### Example Data
+
+Below is an example dataset from the `orders` table:
+
+| customer_id | order_id | product_category | order_date |
+|-------------|----------|------------------|------------|
+| 1           | 101      | Electronics      | 2024-01-01 |
+| 1           | 102      | Clothing         | 2024-01-05 |
+| 1           | 103      | Electronics      | 2024-02-10 |
+| 2           | 104      | Clothing         | 2024-02-12 |
+| 2           | 105      | Clothing         | 2024-03-01 |
+| 3           | 106      | Electronics      | 2024-03-02 |
+| 3           | 107      | Electronics      | 2024-03-15 |
+| 3           | 108      | Clothing         | 2024-03-20 |
+
+#### Expected Output
+
+Your query should produce the following result:
+
+| customer_id | electronics_order_count | clothing_order_count |
+|-------------|-------------------------|----------------------|
+| 1           | 2                       | 1                    |
+| 2           | 0                       | 2                    |
+| 3           | 2                       | 1                    |
+
+#### Instructions
+
+1. **Use the `CASE` expression**: Use a `CASE` expression inside the `COUNT()` function to conditionally count the number of orders for each category.
+2. **Group the results**: Group the result set by `customer_id` to calculate the counts for each customer.
+3. **Handle missing categories**: Ensure that customers who haven't placed orders in one of the categories appear in the result with a count of 0.
+
+#### Example Query
+
+```sql
+SELECT 
+    customer_id, 
+    COUNT(CASE WHEN product_category = 'Electronics' THEN 1 ELSE NULL END) AS electronics_order_count, 
+    COUNT(CASE WHEN product_category = 'Clothing' THEN 1 ELSE NULL END) AS clothing_order_count
+FROM 
+    orders
+GROUP BY 
+    customer_id;
+```
+
+### Key Learning Objectives
+
+- **Aggregation with COUNT()**: Learn to aggregate data by grouping and using conditional logic to count specific cases.
+- **Grouping results**: Understand how to use GROUP BY to create grouped summaries based on customer IDs.
+- **Conditional counting**: Use CASE statements to filter specific data for counting.
 
