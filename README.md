@@ -124,6 +124,7 @@ ORDER BY
 ## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> CRM System - Find customers that bought product A and B but not C
 
 In this example, we demonstrate how to find customers from `customers` table that bought product `A` and `B` but not `C` in a Customer Relationship Management (CRM) system.
+This is an example in which CASE stamenet is used with aggregate functions.
 
 ```sql
 CREATE TABLE customers (

@@ -100,7 +100,10 @@ WHERE IFNULL(a.product_a_count, 0) > 0
 
 
 -- Solution 3
-SELECT c.customer_id, o.product_a_count, o.product_b_count, o.product_c_count
+SELECT c.customer_id, 
+IFNULL(o.product_a_count, 0) AS product_a_count,
+IFNULL(o.product_b_count, 0) AS product_b_count,
+IFNULL(o.product_c_count, 0) AS product_c_count
 FROM customers c
 LEFT JOIN (
 SELECT o1.customer_id, COUNT(CASE WHEN o1.product_name = 'A' THEN 1 ELSE NULL END) AS 'product_a_count', COUNT(CASE WHEN o1.product_name = 'B' THEN 1 ELSE NULL END) AS 'product_b_count',
