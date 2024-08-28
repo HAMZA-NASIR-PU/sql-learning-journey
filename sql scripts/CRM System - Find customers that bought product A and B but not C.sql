@@ -97,3 +97,15 @@ LEFT JOIN (
 WHERE IFNULL(a.product_a_count, 0) > 0
   AND IFNULL(b.product_b_count, 0) > 0
   AND IFNULL(c.product_c_count, 0) = 0;
+
+
+-- Solution 3
+SELECT c.customer_id, o.product_a_count, o.product_b_count, o.product_c_count
+FROM customers c
+LEFT JOIN (
+SELECT o1.customer_id, COUNT(CASE WHEN o1.product_name = 'A' THEN 1 ELSE NULL END) AS 'product_a_count', COUNT(CASE WHEN o1.product_name = 'B' THEN 1 ELSE NULL END) AS 'product_b_count',
+COUNT(CASE WHEN o1.product_name = 'C' THEN 1 ELSE NULL END) AS 'product_c_count'
+FROM orders o1
+GROUP BY o1.customer_id
+) AS o ON c.customer_id = o.customer_id
+WHERE COALESCE(o.product_a_count, 0) <> 0 AND COALESCE(o.product_b_count, 0) <> 0 AND COALESCE(o.product_c_count, 0) = 0;
