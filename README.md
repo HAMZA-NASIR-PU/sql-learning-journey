@@ -617,57 +617,6 @@ END;
 This query segments customers into different tiers based on complex conditions involving their purchase behavior, interaction frequency, and subscription status. It is a typical example of how CRM systems can leverage SQL for advanced customer analytics and segmentation.
 
 
-## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> Leetcode - Problem 182. Duplicate Emails
-
-
-| Id  | email  |
-|-------------|-----------------|
-| 1           | john@example.com     |
-| 2           | bob@example.com     |
-| 3           | john@example.com     |
-
-```sql
-CREATE TABLE Person (
-    Id INT PRIMARY KEY,
-    Email VARCHAR(255)
-);
-
-INSERT INTO Person (Id, Email) VALUES 
-(1, 'john@example.com'),
-(2, 'bob@example.com'),
-(3, 'john@example.com');
-
--- Solution 1: Using GROUP BY and HAVING
-SELECT Email
-FROM Person
-GROUP BY Email
-HAVING COUNT(*) > 1;
-
--- Solution 2: Using a subquery with IN
-SELECT DISTINCT Email
-FROM Person
-WHERE Email IN (
-    SELECT Email
-    FROM Person
-    GROUP BY Email
-    HAVING COUNT(*) > 1
-);
-
--- Solution 3: Using JOIN
-SELECT p1.Email
-FROM Person p1
-JOIN Person p2 ON p1.Email = p2.Email
-WHERE p1.Id <> p2.Id
-GROUP BY p1.Email;
-```
-
-Each of these solutions will return:
-
-| Email          |
-|----------------|
-| john@example.com |
-
-
 ## <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width ="25" style="margin-bottom: -5px;"> LeetCode - Problem 2837: Total Traveled Distance
 
 
