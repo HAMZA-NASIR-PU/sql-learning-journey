@@ -1424,3 +1424,103 @@ GROUP BY
 - **Grouping results**: Understand how to use GROUP BY to create grouped summaries based on customer IDs.
 - **Conditional counting**: Use CASE statements to filter specific data for counting.
 
+
+## SQL Joins with best explanation
+
+Consider two tables, `Author` and `Book` tables and demonstrate `Inner Join`, `Left Join`, and `Right Join` with examples.
+
+---
+
+### Tables
+
+#### Author Table
+| AuthorID | AuthorName |
+|----------|------------|
+| 1        | Author A   |
+| 2        | Author B   |
+| 3        | Author C   |
+
+#### Book Table
+| BookID | BookTitle          | AuthorID |
+|--------|--------------------|----------|
+| 101    | Book 1             | 1        |
+| 102    | Book 2             | 2        |
+| 103    | Book 3             | 2        |
+| 104    | Orphan Book        | NULL     |
+
+---
+
+#### SQL Joins
+
+
+
+##### 1. **Inner Join**
+**Definition**: Retrieves records where there is a match in both tables.
+
+**Query**:
+```sql
+SELECT Author.AuthorID, Author.AuthorName, Book.BookID, Book.BookTitle
+FROM Author
+INNER JOIN Book
+ON Author.AuthorID = Book.AuthorID;
+```
+
+**Result**:
+| AuthorID | AuthorName | BookID | BookTitle |
+|----------|------------|--------|-----------|
+| 1        | Author A   | 101    | Book 1    |
+| 2        | Author B   | 102    | Book 2    |
+| 2        | Author B   | 103    | Book 3    |
+
+---
+
+##### 2. **Left Join**
+**Definition**: Retrieves all records from the left table (Author), and matching records from the right table (Book). Unmatched rows will have `NULL` for Book fields.
+
+**Query**:
+```sql
+SELECT Author.AuthorID, Author.AuthorName, Book.BookID, Book.BookTitle
+FROM Author
+LEFT JOIN Book
+ON Author.AuthorID = Book.AuthorID;
+```
+
+**Result**:
+| AuthorID | AuthorName | BookID | BookTitle |
+|----------|------------|--------|-----------|
+| 1        | Author A   | 101    | Book 1    |
+| 2        | Author B   | 102    | Book 2    |
+| 2        | Author B   | 103    | Book 3    |
+| 3        | Author C   | NULL   | NULL      |
+
+---
+
+##### 3. **Right Join**
+**Definition**: Retrieves all records from the right table (Book), and matching records from the left table (Author). Unmatched rows will have `NULL` for Author fields.
+
+**Query**:
+```sql
+SELECT Author.AuthorID, Author.AuthorName, Book.BookID, Book.BookTitle
+FROM Author
+RIGHT JOIN Book
+ON Author.AuthorID = Book.AuthorID;
+```
+
+**Result**:
+| AuthorID | AuthorName | BookID | BookTitle    |
+|----------|------------|--------|--------------|
+| 1        | Author A   | 101    | Book 1       |
+| 2        | Author B   | 102    | Book 2       |
+| 2        | Author B   | 103    | Book 3       |
+| NULL     | NULL       | 104    | Orphan Book  |
+
+---
+
+#### Summary with IDs
+1. **Inner Join**: Displays only rows where `Author.AuthorID = Book.AuthorID`.
+2. **Left Join**: Displays all rows from the `Author` table and matches from `Book`, with `NULL` for non-matching rows.
+3. **Right Join**: Displays all rows from the `Book` table and matches from `Author`, with `NULL` for non-matching rows.
+
+
+
+
